@@ -1,0 +1,93 @@
+version: 2.0
+
+defaults: &defaults
+  working_directory: ~/repo
+  environment:
+    - GIT_COMMIT_DESC: git log --format=oneline -n 1 $CIRCLE_SHA1
+
+js_defaults: &js_defaults
+  <<: *defaults
+  docker:
+    - image: circleci/node:8-stretch
+
+jobs:
+  checkout_code:
+    <<: *js_defaults
+    steps:
+      - checkout
+      - persist_to_workspace:
+          root: .
+          paths: .
+
+  install_js_dependencies:
+    <<: *js_defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v1-node-deps-{{ .Branch }}-
+            - v1-node-deps-master
+            # fallback to using the latest cache if no exact match is found
+            - v1-node-deps-
+      - run:
+          name: Run yarn install
+          command: yarn install --check-files --frozen-lockfile
+      - save_cache:
+          key: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+
+  js_tests:
+    <<: *js_defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run yarn install
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Run JS tests
+          command: yarn test --ci
+      #     command: |
+      #       mkdir -p ~/repo/reports/junit
+      #       export JEST_JUNIT_OUTPUT="$HOME/repo/reports/junit/js-test-results.xml"
+      #       yarn test --ci --testResultsProcessor="jest-junit"
+      # - store_test_results:
+      #     path: ../reports/junit
+      # - store_artifacts:
+      #     path: ../reports/junit
+
+  js_build_test:
+    <<: *js_defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - restore_cache:
+          keys:
+            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run yarn install
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Run test build
+          command: yarn build
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - checkout_code
+      - install_js_dependencies:
+          requires:
+            - checkout_code
+      - js_tests:
+          requires:
+            - install_js_dependencies
+      - js_build_test:
+          requires:
+            - install_js_dependencies
