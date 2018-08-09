@@ -33,7 +33,7 @@ jobs:
             - v1-node-deps-
       - run:
           name: Run yarn install
-          command: yarn install --frozen-lockfile
+          command: yarn install --check-files --frozen-lockfile
       - save_cache:
           key: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
