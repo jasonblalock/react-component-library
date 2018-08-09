@@ -33,7 +33,7 @@ jobs:
             - v1-node-deps-
       - run:
           name: Run yarn install
-          command: yarn install --check-files --frozen-lockfile
+          command: yarn install --frozen-lockfile
       - run:
           name: Run node-prune
           command: |
