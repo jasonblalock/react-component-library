@@ -38,7 +38,7 @@ jobs:
           name: Run node-prune
           command: |
             curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash
-            node-prune
+            ./bin/node-prune
       - persist_to_workspace:
           root: .
           paths: node_modules
