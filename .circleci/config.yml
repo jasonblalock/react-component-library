@@ -34,6 +34,14 @@ jobs:
       - run:
           name: Run yarn install
           command: yarn install --check-files --frozen-lockfile
+      - run:
+          name: Run node-prune
+          command: |
+            curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash
+            node-prune
+      - persist_to_workspace:
+          root: .
+          paths: node_modules
       - save_cache:
           key: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -44,9 +52,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - restore_cache:
-          keys:
-            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Run JS tests
           command: yarn test --ci
@@ -64,9 +69,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - restore_cache:
-          keys:
-            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Run test build
           command: yarn build
