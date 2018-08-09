@@ -38,18 +38,15 @@ jobs:
           key: v1-yarn-pkgs-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+      - persist_to_workspace:
+          root: .
+          paths: node_modules
 
   js_tests:
     <<: *js_defaults
     steps:
       - attach_workspace:
           at: ~/repo
-      - restore_cache:
-          keys:
-            - v1-yarn-pkgs-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: Run yarn install
-          command: yarn install --frozen-lockfile
       - run:
           name: Run JS tests
           command: yarn test --ci
@@ -67,9 +64,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - restore_cache:
-          keys:
-            - v1-yarn-pkgs-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Run yarn install
           command: yarn install --frozen-lockfile
