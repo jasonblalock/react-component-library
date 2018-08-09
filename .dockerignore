@@ -1,0 +1,12 @@
+.git/*
+**/node_modules
+.dockerignore
+**/.gitignore
+Dockerfile*
+**/log/*
+**/tmp/*
+**/coverage/
+**/reports/
+**/*.log
+README.md
+**/.DS_Store

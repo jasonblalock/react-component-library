@@ -1,0 +1,50 @@
+FROM node:8-alpine
+
+ENV APP_HOME=/app \
+    EDITOR=vim
+
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache git openssh bash vim
+
+RUN mkdir -p $APP_HOME \
+    && chown -R node:node $APP_HOME \
+    && chmod 755 $APP_HOME
+
+ENV YARN_VERSION 1.9.4
+
+RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
+  && for key in \
+    6A010C5166006599AA17F08146C2130DFD2497F5 \
+  ; do \
+    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+  done \
+  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
+  && curl -fsSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
+  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
+  && mkdir -p /opt \
+  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
+  && ln -sf /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
+  && ln -sf /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
+  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
+  && apk del .build-deps-yarn
+
+USER node
+
+ENV YARN_CACHE_FOLDER=/home/node/.cache/yarn \
+    YARN_OFFLINE_FOLDER=/home/node/npm-packages-offline-cache \
+    PATH=/home/node/.yarn/bin:$PATH
+
+
+RUN mkdir -p $APP_HOME/node_modules $YARN_CACHE_FOLDER /home/node/.netlify $YARN_OFFLINE_FOLDER
+
+WORKDIR $APP_HOME
+
+RUN yarn global add create-react-app @storybook/cli \
+    && yarn cache clean
+RUN yarn config set yarn-offline-mirror $HOME/npm-packages-offline-cache
+RUN yarn config set yarn-offline-mirror-pruning true
+
+COPY ./entrypoint.sh /home/node/
