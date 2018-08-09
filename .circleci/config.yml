@@ -26,20 +26,16 @@ jobs:
           at: ~/repo
       - restore_cache:
           keys:
-            - v1-yarn-pkgs-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v1-yarn-pkgs-{{ .Branch }}-
-            - v1-yarn-pkgs-master
+            - v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v1-node-deps-{{ .Branch }}-
+            - v1-node-deps-master
             # fallback to using the latest cache if no exact match is found
-            - v1-yarn-pkgs-
+            - v1-node-deps-
       - run:
           name: Run yarn install
-          command: yarn install --frozen-lockfile
+          command: yarn install --check-files --frozen-lockfile
       - save_cache:
-          key: v1-yarn-pkgs-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
-      - persist_to_workspace:
-          root: .
+          key: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths: node_modules
 
   js_tests:
@@ -47,6 +43,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
+      - restore_cache:
+          keys: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Run JS tests
           command: yarn test --ci
@@ -64,9 +62,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - run:
-          name: Run yarn install
-          command: yarn install --frozen-lockfile
+      - restore_cache:
+          keys: v1-node-deps-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run:
           name: Run test build
           command: yarn build
