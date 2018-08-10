@@ -16,7 +16,7 @@
     "eject": "react-app-rewired eject",
     "lint": "eslint --ext js,jsx .",
     "lint:fix": "yarn lint --fix",
-    "lint:ci": "yarn lint --format junit -o reports/junit/js-lint-results.xml",
+    "lint:ci": "yarn lint --format junit -o reports/junit/eslint/lint-results.xml",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
   },
   "devDependencies": {
@@ -42,6 +42,6 @@
     "reporters": [ "default", "jest-junit" ]
   },
   "jest-junit": {
-    "output": "reports/junit/js-test-results.xml"
+    "output": "reports/junit/jest/test-results.xml"
   }
 }
