@@ -4,17 +4,19 @@
   "private": true,
   "dependencies": {
     "react": "^16.4.2",
+    "react-app-rewired": "^1.5.2",
     "react-dom": "^16.4.2",
     "react-scripts": "1.1.4"
   },
   "scripts": {
     "precommit": "lint-staged",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-app-rewired eject",
     "lint": "eslint --ext js,jsx .",
     "lint:fix": "yarn lint --fix",
+    "lint:ci": "yarn lint --format junit -o reports/junit/js-lint-results.xml",
     "eslint-check": "eslint --print-config .eslintrc.js | eslint-config-prettier-check"
   },
   "devDependencies": {
@@ -26,6 +28,7 @@
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.10.0",
     "husky": "^0.14.3",
+    "jest-junit": "^5.1.0",
     "lint-staged": "^7.2.0",
     "prettier": "^1.14.2"
   },
@@ -34,5 +37,11 @@
       "yarn lint:fix",
       "git add"
     ]
+  },
+  "jest": {
+    "reporters": [ "default", "jest-junit" ]
+  },
+  "jest-junit": {
+    "output": "reports/junit/js-test-results.xml"
   }
 }

@@ -54,7 +54,11 @@ jobs:
           at: ~/repo
       - run:
           name: Run JS linting
-          command: yarn lint
+          command: yarn lint:ci
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
 
   js_tests:
     <<: *js_defaults
@@ -64,14 +68,10 @@ jobs:
       - run:
           name: Run JS tests
           command: yarn test --ci
-      #     command: |
-      #       mkdir -p ~/repo/reports/junit
-      #       export JEST_JUNIT_OUTPUT="$HOME/repo/reports/junit/js-test-results.xml"
-      #       yarn test --ci --testResultsProcessor="jest-junit"
-      # - store_test_results:
-      #     path: ../reports/junit
-      # - store_artifacts:
-      #     path: ../reports/junit
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
 
   js_build_test:
     <<: *js_defaults
