@@ -1,6 +1,6 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "react-component-library",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
     "react": "^16.4.2",
@@ -39,7 +39,10 @@
     ]
   },
   "jest": {
-    "reporters": [ "default", "jest-junit" ]
+    "reporters": [
+      "default",
+      "jest-junit"
+    ]
   },
   "jest-junit": {
     "output": "reports/junit/jest/test-results.xml"
