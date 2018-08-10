@@ -47,6 +47,15 @@ jobs:
           root: .
           paths: node_modules
 
+  js_lint:
+    <<: *js_defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Run test build
+          command: yarn lint
+
   js_tests:
     <<: *js_defaults
     steps:
@@ -81,6 +90,9 @@ workflows:
       - install_js_dependencies:
           requires:
             - checkout_code
+      - js_lint:
+          requires:
+            - install_js_dependencies
       - js_tests:
           requires:
             - install_js_dependencies
