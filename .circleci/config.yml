@@ -53,7 +53,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run:
-          name: Run test build
+          name: Run JS linting
           command: yarn lint
 
   js_tests:
